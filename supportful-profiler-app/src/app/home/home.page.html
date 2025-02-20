@@ -18,3 +18,50 @@
     <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
   </div>
 </ion-content>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <h1>Welcome to Supportful Profiler</h1>
+    <p>Manage your talent profiles, clients, and assignments in one place.</p>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="4">
+          <ion-card routerLink="/profiles" routerDirection="root">
+            <ion-card-header>
+              <ion-icon name="people-outline" size="large"></ion-icon>
+              <ion-card-title>Profiles</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Manage talent profiles, skills, and availability.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card routerLink="/clients" routerDirection="root">
+            <ion-card-header>
+              <ion-icon name="business-outline" size="large"></ion-icon>
+              <ion-card-title>Clients</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Track client information, contacts, and requirements.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="4">
+          <ion-card routerLink="/assignments" routerDirection="root">
+            <ion-card-header>
+              <ion-icon name="briefcase-outline" size="large"></ion-icon>
+              <ion-card-title>Assignments</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Manage talent assignments and track progress.
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
