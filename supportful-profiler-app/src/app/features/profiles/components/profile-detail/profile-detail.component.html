@@ -1,0 +1,182 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profiles"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Profile Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="editProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+      <ion-button (click)="deleteProfile()" color="danger">
+        <ion-icon name="trash-outline"></ion-icon>
+        Delete
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="ion-text-center">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="!loading && profile">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ profile.firstName }} {{ profile.lastName }}</ion-card-title>
+              <ion-card-subtitle>{{ profile.title }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item>
+                  <ion-icon name="mail-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Email</h3>
+                    <p>{{ profile.email }}</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item *ngIf="profile.phone">
+                  <ion-icon name="call-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Phone</h3>
+                    <p>{{ profile.phone }}</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="location-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Location</h3>
+                    <p>{{ profile.location }} ({{ profile.timezone }})</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="time-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Availability</h3>
+                    <p>{{ profile.availability }}</p>
+                  </ion-label>
+                  <ion-badge [color]="profile.availability === 'immediate' ? 'success' : 'warning'" slot="end">
+                    {{ profile.availability }}
+                  </ion-badge>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Work Type</h3>
+                    <p>{{ profile.preferredWorkType }}</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="cash-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Rate</h3>
+                    <p>${{ profile.rate }}/hour</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="school-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Experience</h3>
+                    <p>{{ profile.experience }} years</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="code-working-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Skills</h3>
+                    <p>
+                      <ion-chip *ngFor="let skill of profile.skills" color="primary" outline>
+                        {{ skill }}
+                      </ion-chip>
+                    </p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card *ngIf="profile.linkedinUrl || profile.githubUrl || profile.portfolioUrl">
+            <ion-card-header>
+              <ion-card-title>Links</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item *ngIf="profile.linkedinUrl" [href]="profile.linkedinUrl" target="_blank">
+                  <ion-icon name="logo-linkedin" slot="start"></ion-icon>
+                  <ion-label>LinkedIn Profile</ion-label>
+                </ion-item>
+                <ion-item *ngIf="profile.githubUrl" [href]="profile.githubUrl" target="_blank">
+                  <ion-icon name="logo-github" slot="start"></ion-icon>
+                  <ion-label>GitHub Profile</ion-label>
+                </ion-item>
+                <ion-item *ngIf="profile.portfolioUrl" [href]="profile.portfolioUrl" target="_blank">
+                  <ion-icon name="globe-outline" slot="start"></ion-icon>
+                  <ion-label>Portfolio</ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Notes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <form [formGroup]="noteForm" (ngSubmit)="addNote()">
+                <ion-item>
+                  <ion-label position="floating">Add Note</ion-label>
+                  <ion-textarea formControlName="content" rows="3"></ion-textarea>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Type</ion-label>
+                  <ion-select formControlName="type">
+                    <ion-select-option value="general">General</ion-select-option>
+                    <ion-select-option value="meeting">Meeting</ion-select-option>
+                    <ion-select-option value="requirement">Requirement</ion-select-option>
+                    <ion-select-option value="feedback">Feedback</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-button expand="block" type="submit" [disabled]="!noteForm.valid" class="ion-margin-top">
+                  Add Note
+                </ion-button>
+              </form>
+
+              <ion-list *ngIf="profile.notes && profile.notes.length > 0">
+                <ion-item *ngFor="let note of profile.notes">
+                  <ion-label>
+                    <h3>{{ note.content }}</h3>
+                    <p>{{ note.createdAt | date:'medium' }}</p>
+                  </ion-label>
+                  <ion-badge [color]="getNoteBadgeColor(note.type)" slot="end">
+                    {{ note.type }}
+                  </ion-badge>
+                  <ion-button fill="clear" color="danger" (click)="deleteNote(note.id!)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-button>
+                </ion-item>
+              </ion-list>
+
+              <div *ngIf="!profile.notes || profile.notes.length === 0" class="ion-text-center ion-padding">
+                <ion-text color="medium">No notes yet</ion-text>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

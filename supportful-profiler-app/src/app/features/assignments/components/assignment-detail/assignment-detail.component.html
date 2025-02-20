@@ -1,0 +1,141 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/assignments"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Assignment Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="editAssignment()">
+        <ion-icon name="create-outline"></ion-icon>
+        Edit
+      </ion-button>
+      <ion-button (click)="deleteAssignment()" color="danger">
+        <ion-icon name="trash-outline"></ion-icon>
+        Delete
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="ion-text-center">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="!loading && assignment">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ assignment.position }}</ion-card-title>
+              <ion-badge [color]="getStatusColor(assignment.status)" class="ion-margin-top">
+                {{ assignment.status }}
+              </ion-badge>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item button (click)="viewProfile(assignment.profile.id!)" *ngIf="assignment.profile?.id">
+                  <ion-icon name="person-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Profile</h3>
+                    <p>{{ assignment.profile.firstName }} {{ assignment.profile.lastName }}</p>
+                    <p>{{ assignment.profile.title }}</p>
+                  </ion-label>
+                  <ion-icon name="chevron-forward" slot="end"></ion-icon>
+                </ion-item>
+
+                <ion-item button (click)="viewClient(assignment.client.id!)" *ngIf="assignment.client?.id">
+                  <ion-icon name="business-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Client</h3>
+                    <p>{{ assignment.client.companyName }}</p>
+                    <p>{{ assignment.client.industry }}</p>
+                  </ion-label>
+                  <ion-icon name="chevron-forward" slot="end"></ion-icon>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="cash-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Rate</h3>
+                    <p>${{ assignment.rate }}/hour</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Work Type</h3>
+                    <p>{{ assignment.workType }}</p>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item>
+                  <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Duration</h3>
+                    <p>
+                      {{ assignment.startDate | date }} - 
+                      {{ assignment.endDate ? (assignment.endDate | date) : 'Present' }}
+                    </p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Notes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <form [formGroup]="noteForm" (ngSubmit)="addNote()">
+                <ion-item>
+                  <ion-label position="floating">Add Note</ion-label>
+                  <ion-textarea formControlName="content" rows="3"></ion-textarea>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Type</ion-label>
+                  <ion-select formControlName="type">
+                    <ion-select-option value="general">General</ion-select-option>
+                    <ion-select-option value="interview">Interview</ion-select-option>
+                    <ion-select-option value="feedback">Feedback</ion-select-option>
+                    <ion-select-option value="performance">Performance</ion-select-option>
+                    <ion-select-option value="issue">Issue</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-button expand="block" type="submit" [disabled]="!noteForm.valid" class="ion-margin-top">
+                  Add Note
+                </ion-button>
+              </form>
+
+              <ion-list>
+                <ion-item-sliding *ngFor="let note of assignment.notes">
+                  <ion-item>
+                    <ion-label>
+                      <h3>
+                        <ion-badge [color]="getNoteBadgeColor(note.type)">{{ note.type }}</ion-badge>
+                        <ion-text class="ion-padding-start">
+                          {{ note.createdAt | date:'medium' }}
+                        </ion-text>
+                      </h3>
+                      <p class="ion-padding-top">{{ note.content }}</p>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item-options side="end">
+                    <ion-item-option color="danger" (click)="deleteNote(note.id!)">
+                      <ion-icon slot="icon-only" name="trash"></ion-icon>
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

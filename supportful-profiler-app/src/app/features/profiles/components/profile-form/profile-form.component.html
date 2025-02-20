@@ -1,0 +1,161 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon name="arrow-back"></ion-icon>
+        Back
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Edit Profile' : 'New Profile' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">First Name *</ion-label>
+            <ion-input formControlName="firstName" type="text"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="profileForm.get('firstName')?.touched && profileForm.get('firstName')?.errors?.['required']">
+            First name is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Last Name *</ion-label>
+            <ion-input formControlName="lastName" type="text"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="profileForm.get('lastName')?.touched && profileForm.get('lastName')?.errors?.['required']">
+            Last name is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Email *</ion-label>
+            <ion-input formControlName="email" type="email"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.errors?.['required']">
+            Email is required
+          </ion-note>
+          <ion-note color="danger" *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.errors?.['email']">
+            Please enter a valid email
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Phone</ion-label>
+            <ion-input formControlName="phone" type="tel"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Title *</ion-label>
+            <ion-input formControlName="title" type="text"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="profileForm.get('title')?.touched && profileForm.get('title')?.errors?.['required']">
+            Title is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Skills * (comma-separated)</ion-label>
+            <ion-input formControlName="skills" type="text" placeholder="e.g. React, Node.js, TypeScript"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="profileForm.get('skills')?.touched && profileForm.get('skills')?.errors?.['required']">
+            Skills are required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Experience (years) *</ion-label>
+            <ion-input formControlName="experience" type="number" min="0"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Rate ($/hour) *</ion-label>
+            <ion-input formControlName="rate" type="number" min="0"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Availability *</ion-label>
+            <ion-select formControlName="availability">
+              <ion-select-option value="immediate">Immediate</ion-select-option>
+              <ion-select-option value="two_weeks">Two Weeks</ion-select-option>
+              <ion-select-option value="one_month">One Month</ion-select-option>
+              <ion-select-option value="unavailable">Unavailable</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Preferred Work Type *</ion-label>
+            <ion-select formControlName="preferredWorkType">
+              <ion-select-option value="remote">Remote</ion-select-option>
+              <ion-select-option value="onsite">Onsite</ion-select-option>
+              <ion-select-option value="hybrid">Hybrid</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Location *</ion-label>
+            <ion-input formControlName="location" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Timezone *</ion-label>
+            <ion-input formControlName="timezone" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">LinkedIn URL</ion-label>
+            <ion-input formControlName="linkedinUrl" type="url"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">GitHub URL</ion-label>
+            <ion-input formControlName="githubUrl" type="url"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Portfolio URL</ion-label>
+            <ion-input formControlName="portfolioUrl" type="url"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div class="ion-padding">
+      <ion-button expand="block" type="submit" [disabled]="!profileForm.valid || loading">
+        <ion-spinner *ngIf="loading"></ion-spinner>
+        <span *ngIf="!loading">{{ isEdit ? 'Update' : 'Create' }} Profile</span>
+      </ion-button>
+      <ion-button expand="block" fill="clear" (click)="cancel()">
+        Cancel
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon name="arrow-back"></ion-icon>
+        Back
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Edit Assignment' : 'New Assignment' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Profile *</ion-label>
+            <ion-select formControlName="profileId">
+              <ion-select-option *ngFor="let profile of profiles" [value]="profile.id">
+                {{ profile.firstName }} {{ profile.lastName }} - {{ profile.title }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note color="danger" *ngIf="assignmentForm.get('profileId')?.touched && assignmentForm.get('profileId')?.errors?.['required']">
+            Profile is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Client *</ion-label>
+            <ion-select formControlName="clientId">
+              <ion-select-option *ngFor="let client of clients" [value]="client.id">
+                {{ client.companyName }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note color="danger" *ngIf="assignmentForm.get('clientId')?.touched && assignmentForm.get('clientId')?.errors?.['required']">
+            Client is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Position *</ion-label>
+            <ion-input formControlName="position" type="text"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="assignmentForm.get('position')?.touched && assignmentForm.get('position')?.errors?.['required']">
+            Position is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Rate ($/hour) *</ion-label>
+            <ion-input formControlName="rate" type="number" min="0"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="assignmentForm.get('rate')?.touched && assignmentForm.get('rate')?.errors?.['required']">
+            Rate is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Work Type *</ion-label>
+            <ion-select formControlName="workType">
+              <ion-select-option value="remote">Remote</ion-select-option>
+              <ion-select-option value="onsite">Onsite</ion-select-option>
+              <ion-select-option value="hybrid">Hybrid</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Start Date *</ion-label>
+            <ion-datetime-button datetime="startDate"></ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime id="startDate" formControlName="startDate"></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+          <ion-note color="danger" *ngIf="assignmentForm.get('startDate')?.touched && assignmentForm.get('startDate')?.errors?.['required']">
+            Start date is required
+          </ion-note>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">End Date</ion-label>
+            <ion-datetime-button datetime="endDate"></ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime id="endDate" formControlName="endDate"></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Status *</ion-label>
+            <ion-select formControlName="status">
+              <ion-select-option value="proposed">Proposed</ion-select-option>
+              <ion-select-option value="interviewing">Interviewing</ion-select-option>
+              <ion-select-option value="offered">Offered</ion-select-option>
+              <ion-select-option value="accepted">Accepted</ion-select-option>
+              <ion-select-option value="rejected">Rejected</ion-select-option>
+              <ion-select-option value="active">Active</ion-select-option>
+              <ion-select-option value="completed">Completed</ion-select-option>
+              <ion-select-option value="terminated">Terminated</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div class="ion-padding">
+      <ion-button expand="block" type="submit" [disabled]="!assignmentForm.valid || loading">
+        <ion-spinner *ngIf="loading"></ion-spinner>
+        <span *ngIf="!loading">{{ isEdit ? 'Update' : 'Create' }} Assignment</span>
+      </ion-button>
+      <ion-button expand="block" fill="clear" (click)="cancel()">
+        Cancel
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Assignments</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createAssignment()">
+        <ion-icon name="add"></ion-icon>
+        New Assignment
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="filterForm">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-searchbar formControlName="search" placeholder="Search assignments..."></ion-searchbar>
+        </ion-col>
+        <ion-col size="12" size-md="3">
+          <ion-item>
+            <ion-label position="floating">Status</ion-label>
+            <ion-select formControlName="status">
+              <ion-select-option value="">All</ion-select-option>
+              <ion-select-option value="proposed">Proposed</ion-select-option>
+              <ion-select-option value="interviewing">Interviewing</ion-select-option>
+              <ion-select-option value="offered">Offered</ion-select-option>
+              <ion-select-option value="accepted">Accepted</ion-select-option>
+              <ion-select-option value="rejected">Rejected</ion-select-option>
+              <ion-select-option value="active">Active</ion-select-option>
+              <ion-select-option value="completed">Completed</ion-select-option>
+              <ion-select-option value="terminated">Terminated</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="3">
+          <ion-item>
+            <ion-label position="floating">Work Type</ion-label>
+            <ion-select formControlName="workType">
+              <ion-select-option value="">All</ion-select-option>
+              <ion-select-option value="remote">Remote</ion-select-option>
+              <ion-select-option value="onsite">Onsite</ion-select-option>
+              <ion-select-option value="hybrid">Hybrid</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+
+  <div class="ion-padding">
+    <ion-list *ngIf="!loading && assignments.length > 0">
+      <ion-item *ngFor="let assignment of assignments" button (click)="viewAssignment(assignment.id!)" [attr.disabled]="!assignment.id">
+        <ion-label>
+          <h2>{{ assignment.profile.firstName }} {{ assignment.profile.lastName }}</h2>
+          <h3>{{ assignment.position }} at {{ assignment.client.companyName }}</h3>
+          <p>
+            <ion-text>{{ assignment.startDate | date }} - {{ assignment.endDate ? (assignment.endDate | date) : 'Present' }}</ion-text>
+            <ion-text class="ion-padding-start">{{ assignment.workType }}</ion-text>
+          </p>
+        </ion-label>
+        <ion-badge [color]="getStatusColor(assignment.status)" slot="end">
+          {{ assignment.status }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="loading">
+      <ion-item *ngFor="let i of [1,2,3,4,5]">
+        <ion-label>
+          <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
+          <h3><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></h3>
+          <p><ion-skeleton-text animated style="width: 90%"></ion-skeleton-text></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="!loading && assignments.length === 0" class="ion-text-center ion-padding">
+      <ion-icon name="briefcase" size="large" color="medium"></ion-icon>
+      <p>No assignments found matching your criteria</p>
+    </div>
+  </div>
+</ion-content>

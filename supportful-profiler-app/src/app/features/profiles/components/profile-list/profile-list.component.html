@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Talent Profiles</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createProfile()">
+        <ion-icon name="add"></ion-icon>
+        Add Profile
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="filterForm">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-searchbar formControlName="search" placeholder="Search profiles..."></ion-searchbar>
+        </ion-col>
+        <ion-col size="12" size-md="6">
+          <ion-item>
+            <ion-label position="floating">Skills</ion-label>
+            <ion-input formControlName="skills" placeholder="e.g. React, Node.js"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="4">
+          <ion-item>
+            <ion-label position="floating">Availability</ion-label>
+            <ion-select formControlName="availability">
+              <ion-select-option value="">All</ion-select-option>
+              <ion-select-option value="immediate">Immediate</ion-select-option>
+              <ion-select-option value="two_weeks">Two Weeks</ion-select-option>
+              <ion-select-option value="one_month">One Month</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="4">
+          <ion-item>
+            <ion-label position="floating">Experience (Years)</ion-label>
+            <ion-select formControlName="experience">
+              <ion-select-option value="">All</ion-select-option>
+              <ion-select-option value="0-2">0-2</ion-select-option>
+              <ion-select-option value="3-5">3-5</ion-select-option>
+              <ion-select-option value="5-8">5-8</ion-select-option>
+              <ion-select-option value="8+">8+</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="4">
+          <ion-item>
+            <ion-label position="floating">Work Type</ion-label>
+            <ion-select formControlName="workType">
+              <ion-select-option value="">All</ion-select-option>
+              <ion-select-option value="remote">Remote</ion-select-option>
+              <ion-select-option value="onsite">Onsite</ion-select-option>
+              <ion-select-option value="hybrid">Hybrid</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+
+  <div class="ion-padding">
+    <ion-list *ngIf="!loading && profiles.length > 0">
+      <ion-item *ngFor="let profile of profiles" button (click)="viewProfile(profile.id!)" [attr.disabled]="!profile.id">
+        <ion-avatar slot="start">
+          <img src="assets/avatar-placeholder.png" alt="Profile avatar">
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ profile.firstName }} {{ profile.lastName }}</h2>
+          <h3>{{ profile.title }}</h3>
+          <p>{{ profile.skills.join(', ') }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="profile.availability === 'immediate' ? 'success' : 'warning'">
+          {{ profile.availability }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="loading">
+      <ion-item *ngFor="let i of [1,2,3,4,5]">
+        <ion-avatar slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
+          <h3><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></h3>
+          <p><ion-skeleton-text animated style="width: 90%"></ion-skeleton-text></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="!loading && profiles.length === 0" class="ion-text-center ion-padding">
+      <ion-icon name="search" size="large" color="medium"></ion-icon>
+      <p>No profiles found matching your criteria</p>
+    </div>
+  </div>
+</ion-content>
