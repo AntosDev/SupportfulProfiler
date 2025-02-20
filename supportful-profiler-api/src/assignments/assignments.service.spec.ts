@@ -87,15 +87,12 @@ describe('AssignmentsService', () => {
 
   describe('findAll', () => {
     it('should return an array of assignments', async () => {
-      const [assignments, count] = await service.findAll({});
-      
+      const assignments = await service.findAll({});
       expect(Array.isArray(assignments)).toBe(true);
-      expect(typeof count).toBe('number');
     });
 
     it('should filter assignments by status', async () => {
-      const [assignments] = await service.findAll({ status: 'pending' });
-      
+      const assignments = await service.findAll({ status: 'pending' });
       expect(Array.isArray(assignments)).toBe(true);
       if (assignments.length > 0) {
         expect(assignments[0].status).toBe('pending');
@@ -115,11 +112,12 @@ describe('AssignmentsService', () => {
         rate: 100,
       });
 
-      const [assignments] = await service.findAll({ startDate, endDate });
+      const assignments = await service.findAll({ startDate, endDate });
       expect(Array.isArray(assignments)).toBe(true);
       if (assignments.length > 0) {
         const foundAssignment = assignments.find(a => a.id === newAssignment.id);
         expect(foundAssignment).toBeDefined();
+        expect(foundAssignment?.profile.id).toBe(testProfile.id);
       }
     });
   });
