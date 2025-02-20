@@ -1,161 +1,185 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="cancel()">
+      <ion-button routerLink="/profiles">
         <ion-icon name="arrow-back"></ion-icon>
         Back
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ isEdit ? 'Edit Profile' : 'New Profile' }}</ion-title>
+    <ion-title>New Profile</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">First Name *</ion-label>
-            <ion-input formControlName="firstName" type="text"></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="profileForm.get('firstName')?.touched && profileForm.get('firstName')?.errors?.['required']">
-            First name is required
-          </ion-note>
-        </ion-col>
+    <ion-list>
+      <ion-item>
+        <ion-label position="floating">First Name *</ion-label>
+        <ion-input formControlName="firstName" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('firstName')?.errors?.['required'] && profileForm.get('firstName')?.touched">
+          First name is required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Last Name *</ion-label>
-            <ion-input formControlName="lastName" type="text"></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="profileForm.get('lastName')?.touched && profileForm.get('lastName')?.errors?.['required']">
-            Last name is required
-          </ion-note>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Last Name *</ion-label>
+        <ion-input formControlName="lastName" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('lastName')?.errors?.['required'] && profileForm.get('lastName')?.touched">
+          Last name is required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Email *</ion-label>
-            <ion-input formControlName="email" type="email"></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.errors?.['required']">
-            Email is required
-          </ion-note>
-          <ion-note color="danger" *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.errors?.['email']">
-            Please enter a valid email
-          </ion-note>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Email *</ion-label>
+        <ion-input formControlName="email" type="email"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('email')?.errors?.['required'] && profileForm.get('email')?.touched">
+          Email is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="profileForm.get('email')?.errors?.['email'] && profileForm.get('email')?.touched">
+          Please enter a valid email address
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Phone</ion-label>
-            <ion-input formControlName="phone" type="tel"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Phone</ion-label>
+        <ion-input formControlName="phone" type="tel"></ion-input>
+      </ion-item>
 
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">Title *</ion-label>
-            <ion-input formControlName="title" type="text"></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="profileForm.get('title')?.touched && profileForm.get('title')?.errors?.['required']">
-            Title is required
-          </ion-note>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Title *</ion-label>
+        <ion-input formControlName="title" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('title')?.errors?.['required'] && profileForm.get('title')?.touched">
+          Title is required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">Skills * (comma-separated)</ion-label>
-            <ion-input formControlName="skills" type="text" placeholder="e.g. React, Node.js, TypeScript"></ion-input>
-          </ion-item>
-          <ion-note color="danger" *ngIf="profileForm.get('skills')?.touched && profileForm.get('skills')?.errors?.['required']">
-            Skills are required
-          </ion-note>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Summary *</ion-label>
+        <ion-textarea formControlName="summary" rows="4"></ion-textarea>
+        <ion-note slot="error" *ngIf="profileForm.get('summary')?.errors?.['required'] && profileForm.get('summary')?.touched">
+          Summary is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="profileForm.get('summary')?.errors?.['minlength'] && profileForm.get('summary')?.touched">
+          Summary must be at least 100 characters
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Experience (years) *</ion-label>
-            <ion-input formControlName="experience" type="number" min="0"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Skills * (comma-separated)</ion-label>
+        <ion-input formControlName="skills" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('skills')?.errors?.['required'] && profileForm.get('skills')?.touched">
+          Skills are required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Rate ($/hour) *</ion-label>
-            <ion-input formControlName="rate" type="number" min="0"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Years of Experience *</ion-label>
+        <ion-input formControlName="yearsOfExperience" type="number" min="0"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('yearsOfExperience')?.errors?.['required'] && profileForm.get('yearsOfExperience')?.touched">
+          Years of experience is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="profileForm.get('yearsOfExperience')?.errors?.['min'] && profileForm.get('yearsOfExperience')?.touched">
+          Years of experience cannot be negative
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Availability *</ion-label>
-            <ion-select formControlName="availability">
-              <ion-select-option value="immediate">Immediate</ion-select-option>
-              <ion-select-option value="two_weeks">Two Weeks</ion-select-option>
-              <ion-select-option value="one_month">One Month</ion-select-option>
-              <ion-select-option value="unavailable">Unavailable</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Expected Rate ($/hour) *</ion-label>
+        <ion-input formControlName="expectedRate" type="number" min="0"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('expectedRate')?.errors?.['required'] && profileForm.get('expectedRate')?.touched">
+          Expected rate is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="profileForm.get('expectedRate')?.errors?.['min'] && profileForm.get('expectedRate')?.touched">
+          Expected rate cannot be negative
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Preferred Work Type *</ion-label>
-            <ion-select formControlName="preferredWorkType">
-              <ion-select-option value="remote">Remote</ion-select-option>
-              <ion-select-option value="onsite">Onsite</ion-select-option>
-              <ion-select-option value="hybrid">Hybrid</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label>Availability *</ion-label>
+        <ion-select formControlName="availability">
+          <ion-select-option *ngFor="let option of availabilityOptions" [value]="option.value">
+            {{option.label}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Location *</ion-label>
-            <ion-input formControlName="location" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Location *</ion-label>
+        <ion-input formControlName="location" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('location')?.errors?.['required'] && profileForm.get('location')?.touched">
+          Location is required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12" size-md="6">
-          <ion-item>
-            <ion-label position="floating">Timezone *</ion-label>
-            <ion-input formControlName="timezone" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">Timezone *</ion-label>
+        <ion-input formControlName="timezone" type="text"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('timezone')?.errors?.['required'] && profileForm.get('timezone')?.touched">
+          Timezone is required
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">LinkedIn URL</ion-label>
-            <ion-input formControlName="linkedinUrl" type="url"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">LinkedIn URL</ion-label>
+        <ion-input formControlName="linkedinUrl" type="url"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('linkedinUrl')?.errors?.['invalidUrl'] && profileForm.get('linkedinUrl')?.touched">
+          Please enter a valid URL
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">GitHub URL</ion-label>
-            <ion-input formControlName="githubUrl" type="url"></ion-input>
-          </ion-item>
-        </ion-col>
+      <ion-item>
+        <ion-label position="floating">GitHub URL</ion-label>
+        <ion-input formControlName="githubUrl" type="url"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('githubUrl')?.errors?.['invalidUrl'] && profileForm.get('githubUrl')?.touched">
+          Please enter a valid URL
+        </ion-note>
+      </ion-item>
 
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">Portfolio URL</ion-label>
-            <ion-input formControlName="portfolioUrl" type="url"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+      <ion-item>
+        <ion-label position="floating">Portfolio URL</ion-label>
+        <ion-input formControlName="portfolioUrl" type="url"></ion-input>
+        <ion-note slot="error" *ngIf="profileForm.get('portfolioUrl')?.errors?.['invalidUrl'] && profileForm.get('portfolioUrl')?.touched">
+          Please enter a valid URL
+        </ion-note>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Preferred Work Type *</ion-label>
+        <ion-select formControlName="preferredWorkType">
+          <ion-select-option *ngFor="let option of workTypeOptions" [value]="option.value">
+            {{option.label}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
 
     <div class="ion-padding">
-      <ion-button expand="block" type="submit" [disabled]="!profileForm.valid || loading">
-        <ion-spinner *ngIf="loading"></ion-spinner>
-        <span *ngIf="!loading">{{ isEdit ? 'Update' : 'Create' }} Profile</span>
+      <ion-button expand="block" type="submit" [disabled]="profileForm.invalid">
+        Create Profile
       </ion-button>
-      <ion-button expand="block" fill="clear" (click)="cancel()">
+      <ion-button expand="block" fill="clear" routerLink="/profiles">
         Cancel
       </ion-button>
+
+      <!-- Debug information -->
+      <div *ngIf="profileForm.invalid" class="form-debug ion-margin-top">
+        <ion-text color="danger">
+          <h6>Form Validation Errors:</h6>
+          <p *ngIf="profileForm.get('firstName')?.errors">First Name: {{ getErrorMessage('firstName') }}</p>
+          <p *ngIf="profileForm.get('lastName')?.errors">Last Name: {{ getErrorMessage('lastName') }}</p>
+          <p *ngIf="profileForm.get('email')?.errors">Email: {{ getErrorMessage('email') }}</p>
+          <p *ngIf="profileForm.get('title')?.errors">Title: {{ getErrorMessage('title') }}</p>
+          <p *ngIf="profileForm.get('summary')?.errors">Summary: {{ getErrorMessage('summary') }}</p>
+          <p *ngIf="profileForm.get('skills')?.errors">Skills: {{ getErrorMessage('skills') }}</p>
+          <p *ngIf="profileForm.get('yearsOfExperience')?.errors">Years of Experience: {{ getErrorMessage('yearsOfExperience') }}</p>
+          <p *ngIf="profileForm.get('expectedRate')?.errors">Expected Rate: {{ getErrorMessage('expectedRate') }}</p>
+          <p *ngIf="profileForm.get('location')?.errors">Location: {{ getErrorMessage('location') }}</p>
+          <p *ngIf="profileForm.get('timezone')?.errors">Timezone: {{ getErrorMessage('timezone') }}</p>
+          <p *ngIf="profileForm.get('linkedinUrl')?.errors">LinkedIn URL: {{ getErrorMessage('linkedinUrl') }}</p>
+          <p *ngIf="profileForm.get('githubUrl')?.errors">GitHub URL: {{ getErrorMessage('githubUrl') }}</p>
+          <p *ngIf="profileForm.get('portfolioUrl')?.errors">Portfolio URL: {{ getErrorMessage('portfolioUrl') }}</p>
+        </ion-text>
+      </div>
     </div>
   </form>
 </ion-content>

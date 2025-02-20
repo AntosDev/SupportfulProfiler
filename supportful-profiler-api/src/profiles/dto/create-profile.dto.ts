@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, IsArray, IsNumber, IsBoolean, IsUrl, Min, MaxLength } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsArray, IsNumber, IsBoolean, IsUrl, Min, MaxLength, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProfileDto {
@@ -20,6 +20,12 @@ export class CreateProfileDto {
   @IsString()
   @IsOptional()
   phone?: string;
+
+  @ApiPropertyOptional({ example: 'Senior Software Engineer', description: 'Professional title' })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  title?: string;
 
   @ApiProperty({
     example: ['JavaScript', 'TypeScript', 'Node.js'],
@@ -48,12 +54,58 @@ export class CreateProfileDto {
   yearsOfExperience: number;
 
   @ApiPropertyOptional({
+    example: 100,
+    description: 'Expected hourly rate in USD',
+    minimum: 0,
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  expectedRate?: number;
+
+  @ApiPropertyOptional({
+    example: 'immediate',
+    description: 'Availability status',
+    enum: ['immediate', 'two_weeks', 'one_month', 'unavailable'],
+  })
+  @IsEnum(['immediate', 'two_weeks', 'one_month', 'unavailable'])
+  @IsOptional()
+  availability?: string;
+
+  @ApiPropertyOptional({
+    example: 'New York',
+    description: 'Current location',
+  })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  location?: string;
+
+  @ApiPropertyOptional({
+    example: '+2',
+    description: 'Timezone offset',
+  })
+  @IsString()
+  @MaxLength(10)
+  @IsOptional()
+  timezone?: string;
+
+  @ApiPropertyOptional({
+    example: 'remote',
+    description: 'Preferred work type',
+    enum: ['remote', 'onsite', 'hybrid'],
+  })
+  @IsEnum(['remote', 'onsite', 'hybrid'])
+  @IsOptional()
+  preferredWorkType?: string;
+
+  @ApiPropertyOptional({
     example: 'https://linkedin.com/in/johndoe',
     description: 'LinkedIn profile URL',
   })
   @IsUrl()
   @IsOptional()
-  linkedInUrl?: string;
+  linkedinUrl?: string;
 
   @ApiPropertyOptional({
     example: 'https://github.com/johndoe',
@@ -70,15 +122,6 @@ export class CreateProfileDto {
   @IsUrl()
   @IsOptional()
   portfolioUrl?: string;
-
-  @ApiPropertyOptional({
-    example: 100,
-    description: 'Expected hourly rate in USD',
-    minimum: 0,
-  })
-  @IsNumber()
-  @IsOptional()
-  expectedRate?: number;
 
   @ApiPropertyOptional({
     example: true,

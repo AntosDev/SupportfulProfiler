@@ -1,11 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { ProfileService } from '../../services/profile.service';
-import { Profile } from '../../../../shared/interfaces/profile.interface';
-import { CommonModule, NgIf } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { ProfileService } from '../../services/profile.service';
+import { Router, RouterModule } from '@angular/router';
+
+function urlValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) {
+    return null;  // Allow empty values
+  }
+
+  try {
+    const url = new URL(control.value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? null : { invalidUrl: true };
+  } catch {
+    return { invalidUrl: true };
+  }
+}
 
 @Component({
   selector: 'app-profile-form',
@@ -14,103 +26,108 @@ import { HttpClientModule } from '@angular/common/http';
   standalone: true,
   imports: [
     CommonModule,
-    IonicModule,
     ReactiveFormsModule,
-    FormsModule,
-    NgIf,
-    HttpClientModule
+    IonicModule,
+    HttpClientModule,
+    RouterModule
   ]
 })
 export class ProfileFormComponent implements OnInit {
-  profileForm: FormGroup;
-  isEdit = false;
-  loading = false;
-  profileId?: number;
+  profileForm!: FormGroup;
+  availabilityOptions = [
+    { value: 'immediate', label: 'Immediate' },
+    { value: 'two_weeks', label: '2 Weeks' },
+    { value: 'one_month', label: '1 Month' },
+    { value: 'unavailable', label: 'Unavailable' }
+  ];
+  workTypeOptions = [
+    { value: 'remote', label: 'Remote' },
+    { value: 'onsite', label: 'On-site' },
+    { value: 'hybrid', label: 'Hybrid' }
+  ];
 
   constructor(
     private fb: FormBuilder,
     private profileService: ProfileService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
+    this.initForm();
+  }
+
+  ngOnInit() {
+    // Form is already initialized in constructor
+  }
+
+  private initForm() {
     this.profileForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
-      title: ['', Validators.required],
-      skills: ['', Validators.required],
-      experience: [0, [Validators.required, Validators.min(0)]],
-      rate: [0, [Validators.required, Validators.min(0)]],
-      availability: ['immediate', Validators.required],
-      location: ['', Validators.required],
-      timezone: ['', Validators.required],
-      linkedinUrl: [''],
-      githubUrl: [''],
-      portfolioUrl: [''],
-      preferredWorkType: ['remote', Validators.required]
+      title: ['', [Validators.required]],
+      summary: ['', [Validators.required, Validators.minLength(100)]],
+      skills: ['', [Validators.required]],
+      yearsOfExperience: [null, [Validators.required, Validators.min(0)]],
+      expectedRate: [null, [Validators.required, Validators.min(0)]],
+      availability: ['immediate', [Validators.required]],
+      location: ['', [Validators.required]],
+      timezone: ['', [Validators.required]],
+      linkedinUrl: ['', [urlValidator]],
+      githubUrl: ['', [urlValidator]],
+      portfolioUrl: ['', [urlValidator]],
+      preferredWorkType: ['remote', [Validators.required]]
+    });
+
+    // Debug form state changes
+    this.profileForm.valueChanges.subscribe(() => {
+      console.log('Form Valid:', this.profileForm.valid);
+      console.log('Form Errors:', this.getFormValidationErrors());
     });
   }
 
-  ngOnInit(): void {
-    this.profileId = Number(this.route.snapshot.paramMap.get('id'));
-    if (this.profileId) {
-      this.isEdit = true;
-      this.loadProfile(this.profileId);
-    }
+  getErrorMessage(fieldName: string): string {
+    const control = this.profileForm.get(fieldName);
+    if (!control || !control.errors) return '';
+
+    const errors = control.errors;
+    if (errors['required']) return 'This field is required';
+    if (errors['email']) return 'Invalid email format';
+    if (errors['minlength']) return `Minimum length is ${errors['minlength'].requiredLength} characters`;
+    if (errors['min']) return `Value must be at least ${errors['min'].min}`;
+    if (errors['invalidUrl']) return 'Invalid URL format';
+    
+    return 'Invalid value';
   }
 
-  private loadProfile(id: number): void {
-    this.loading = true;
-    this.profileService.getProfile(id).subscribe({
-      next: (profile) => {
-        this.profileForm.patchValue({
-          ...profile,
-          skills: profile.skills.join(', ')
-        });
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading profile:', error);
-        this.loading = false;
+  private getFormValidationErrors(): any {
+    const errors: any = {};
+    Object.keys(this.profileForm.controls).forEach(key => {
+      const control = this.profileForm.get(key);
+      if (control?.errors) {
+        errors[key] = control.errors;
       }
     });
+    return errors;
   }
 
-  onSubmit(): void {
+  onSubmit() {
+    console.log('Form submitted. Valid:', this.profileForm.valid);
+    console.log('Form values:', this.profileForm.value);
+    console.log('Form errors:', this.getFormValidationErrors());
+
     if (this.profileForm.valid) {
       const formValue = this.profileForm.value;
-      const profileData = {
-        ...formValue,
-        skills: formValue.skills.split(',').map((skill: string) => skill.trim())
-      };
-
-      this.loading = true;
-      if (this.isEdit && this.profileId) {
-        this.profileService.updateProfile(this.profileId, profileData).subscribe({
-          next: () => this.handleSuccess(),
-          error: (error) => this.handleError(error)
-        });
-      } else {
-        this.profileService.createProfile(profileData).subscribe({
-          next: () => this.handleSuccess(),
-          error: (error) => this.handleError(error)
-        });
-      }
+      // Convert skills from comma-separated string to array
+      formValue.skills = formValue.skills.split(',').map((skill: string) => skill.trim());
+      
+      this.profileService.createProfile(formValue).subscribe({
+        next: () => {
+          this.router.navigate(['/profiles']);
+        },
+        error: (error) => {
+          console.error('Error creating profile:', error);
+        }
+      });
     }
-  }
-
-  private handleSuccess(): void {
-    this.loading = false;
-    this.router.navigate(['/profiles']);
-  }
-
-  private handleError(error: any): void {
-    console.error('Error:', error);
-    this.loading = false;
-  }
-
-  cancel(): void {
-    this.router.navigate(['/profiles']);
   }
 }

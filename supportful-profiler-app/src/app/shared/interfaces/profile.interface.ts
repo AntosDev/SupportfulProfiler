@@ -5,9 +5,10 @@ export interface Profile {
     email: string;
     phone?: string;
     title: string;
+    summary: string;
     skills: string[];
-    experience: number;
-    rate: number;
+    yearsOfExperience: number;
+    expectedRate: number;
     availability: 'immediate' | 'two_weeks' | 'one_month' | 'unavailable';
     location: string;
     timezone: string;
