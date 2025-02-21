@@ -53,10 +53,10 @@
       <ion-item *ngFor="let assignment of assignments" button (click)="viewAssignment(assignment.id!)" [attr.disabled]="!assignment.id">
         <ion-label>
           <h2>{{ assignment.profile.firstName }} {{ assignment.profile.lastName }}</h2>
-          <h3>{{ assignment.position }} at {{ assignment.client.companyName }}</h3>
+          <h3>{{ assignment.additionalInfo?.position }} at {{ assignment.client.companyName }}</h3>
           <p>
             <ion-text>{{ assignment.startDate | date }} - {{ assignment.endDate ? (assignment.endDate | date) : 'Present' }}</ion-text>
-            <ion-text class="ion-padding-start">{{ assignment.workType }}</ion-text>
+            <ion-text class="ion-padding-start">{{ assignment.additionalInfo?.workType }}</ion-text>
           </p>
         </ion-label>
         <ion-badge [color]="getStatusColor(assignment.status)" slot="end">

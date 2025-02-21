@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
-import { Assignment, AssignmentNote } from '../../../shared/interfaces/assignment.interface';
+import { Assignment, AssignmentNote, AssignmentStatus } from '../../../shared/interfaces/assignment.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -19,12 +19,21 @@ export class AssignmentService {
     return this.api.get<Assignment>(`${this.path}/${id}`);
   }
 
-  createAssignment(assignment: Omit<Assignment, 'id' | 'createdAt' | 'updatedAt'>): Observable<Assignment> {
+  createAssignment(assignment: {
+    profileId: string;
+    clientId: string;
+    position: string;
+    rate: number;
+    startDate: string;
+    endDate?: string | null;
+    workType: 'remote' | 'onsite' | 'hybrid';
+    status: AssignmentStatus;
+  }): Observable<Assignment> {
     return this.api.post<Assignment>(this.path, assignment);
   }
 
   updateAssignment(id: string, assignment: Partial<Assignment>): Observable<Assignment> {
-    return this.api.put<Assignment>(`${this.path}/${id}`, assignment);
+    return this.api.patch<Assignment>(`${this.path}/${id}`, assignment);
   }
 
   deleteAssignment(id: string): Observable<void> {
@@ -36,7 +45,7 @@ export class AssignmentService {
   }
 
   updateNote(assignmentId: string, noteId: string, note: Partial<AssignmentNote>): Observable<AssignmentNote> {
-    return this.api.put<AssignmentNote>(`${this.path}/${assignmentId}/notes/${noteId}`, note);
+    return this.api.patch<AssignmentNote>(`${this.path}/${assignmentId}/notes/${noteId}`, note);
   }
 
   deleteNote(assignmentId: string, noteId: string): Observable<void> {

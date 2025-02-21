@@ -76,12 +76,7 @@
         <ion-col size="12" size-md="6">
           <ion-item>
             <ion-label position="floating">Start Date *</ion-label>
-            <ion-datetime-button datetime="startDate"></ion-datetime-button>
-            <ion-modal [keepContentsMounted]="true">
-              <ng-template>
-                <ion-datetime id="startDate" formControlName="startDate"></ion-datetime>
-              </ng-template>
-            </ion-modal>
+            <ion-input type="date" formControlName="startDate"></ion-input>
           </ion-item>
           <ion-note color="danger" *ngIf="assignmentForm.get('startDate')?.touched && assignmentForm.get('startDate')?.errors?.['required']">
             Start date is required
@@ -91,12 +86,7 @@
         <ion-col size="12" size-md="6">
           <ion-item>
             <ion-label position="floating">End Date</ion-label>
-            <ion-datetime-button datetime="endDate"></ion-datetime-button>
-            <ion-modal [keepContentsMounted]="true">
-              <ng-template>
-                <ion-datetime id="endDate" formControlName="endDate"></ion-datetime>
-              </ng-template>
-            </ion-modal>
+            <ion-input type="date" formControlName="endDate"></ion-input>
           </ion-item>
         </ion-col>
 

@@ -28,7 +28,7 @@
         <ion-col size="12" size-md="6">
           <ion-card>
             <ion-card-header>
-              <ion-card-title>{{ assignment.position }}</ion-card-title>
+              <ion-card-title>{{ assignment.additionalInfo?.position }}</ion-card-title>
               <ion-badge [color]="getStatusColor(assignment.status)" class="ion-margin-top">
                 {{ assignment.status }}
               </ion-badge>
@@ -67,7 +67,7 @@
                   <ion-icon name="briefcase-outline" slot="start"></ion-icon>
                   <ion-label>
                     <h3>Work Type</h3>
-                    <p>{{ assignment.workType }}</p>
+                    <p>{{ assignment.additionalInfo?.workType }}</p>
                   </ion-label>
                 </ion-item>
 

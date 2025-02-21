@@ -2,8 +2,10 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Assignment } from './entities/assignment.entity';
+import { AssignmentNote } from './entities/assignment-note.entity';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
+import { CreateNoteDto } from './dto/create-note.dto';
 import { ProfilesService } from '../profiles/profiles.service';
 import { ClientsService } from '../clients/clients.service';
 
@@ -12,6 +14,8 @@ export class AssignmentsService {
   constructor(
     @InjectRepository(Assignment)
     private readonly assignmentRepository: Repository<Assignment>,
+    @InjectRepository(AssignmentNote)
+    private readonly noteRepository: Repository<AssignmentNote>,
     private readonly profilesService: ProfilesService,
     private readonly clientsService: ClientsService,
   ) {}
@@ -24,9 +28,10 @@ export class AssignmentsService {
     const client = await this.clientsService.findOne(clientId);
 
     const assignment = this.assignmentRepository.create({
+      ...rest,
       profile,
       client,
-      ...rest,
+      notes: [],
     });
 
     return await this.assignmentRepository.save(assignment);
@@ -151,5 +156,29 @@ export class AssignmentsService {
       relations: ['profile', 'client'],
       order: { startDate: 'DESC' },
     });
+  }
+
+  async addNote(assignmentId: string, createNoteDto: CreateNoteDto): Promise<AssignmentNote> {
+    const assignment = await this.findOne(assignmentId);
+
+    const note = this.noteRepository.create({
+      ...createNoteDto,
+      assignment,
+    });
+
+    return await this.noteRepository.save(note);
+  }
+
+  async removeNote(assignmentId: string, noteId: string): Promise<void> {
+    const assignment = await this.findOne(assignmentId);
+    const note = await this.noteRepository.findOne({
+      where: { id: noteId, assignment: { id: assignmentId } },
+    });
+
+    if (!note) {
+      throw new NotFoundException(`Note with ID ${noteId} not found in assignment ${assignmentId}`);
+    }
+
+    await this.noteRepository.remove(note);
   }
 } 

@@ -9,9 +9,12 @@ export interface Assignment {
     startDate?: Date;
     endDate?: Date;
     rate: number;
-    position: string;
-    workType: 'remote' | 'onsite' | 'hybrid';
     notes: AssignmentNote[];
+    additionalInfo?: {
+        position?: string;
+        workType?: 'remote' | 'onsite' | 'hybrid';
+        [key: string]: any;
+    };
     createdAt: Date;
     updatedAt: Date;
 }

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Profile } from '../../profiles/entities/profile.entity';
 import { Client } from '../../clients/entities/client.entity';
+import { AssignmentNote } from './assignment-note.entity';
 
 @Entity()
 export class Assignment {
@@ -25,8 +26,8 @@ export class Assignment {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   rate?: number;
 
-  @Column('text', { nullable: true })
-  notes?: string;
+  @OneToMany(() => AssignmentNote, note => note.assignment, { eager: true, cascade: true })
+  notes: AssignmentNote[];
 
   @Column('simple-json', { nullable: true })
   feedback?: Record<string, any>;

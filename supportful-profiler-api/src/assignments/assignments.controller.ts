@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
+import { CreateNoteDto } from './dto/create-note.dto';
 import { ParseDatePipe } from '../common/pipes/parse-date.pipe';
 
 @ApiTags('assignments')
@@ -115,5 +116,31 @@ export class AssignmentsController {
   @ApiResponse({ status: 404, description: 'Assignment not found' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.assignmentsService.remove(id);
+  }
+
+  @Post(':id/notes')
+  @ApiOperation({ summary: 'Add a note to an assignment' })
+  @ApiParam({ name: 'id', description: 'Assignment ID (UUID)' })
+  @ApiResponse({ status: 201, description: 'Note successfully added' })
+  @ApiResponse({ status: 404, description: 'Assignment not found' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid data' })
+  addNote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) createNoteDto: CreateNoteDto,
+  ) {
+    return this.assignmentsService.addNote(id, createNoteDto);
+  }
+
+  @Delete(':assignmentId/notes/:noteId')
+  @ApiOperation({ summary: 'Delete a note from an assignment' })
+  @ApiParam({ name: 'assignmentId', description: 'Assignment ID (UUID)' })
+  @ApiParam({ name: 'noteId', description: 'Note ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Note successfully deleted' })
+  @ApiResponse({ status: 404, description: 'Assignment or note not found' })
+  removeNote(
+    @Param('assignmentId', ParseUUIDPipe) assignmentId: string,
+    @Param('noteId', ParseUUIDPipe) noteId: string,
+  ) {
+    return this.assignmentsService.removeNote(assignmentId, noteId);
   }
 } 

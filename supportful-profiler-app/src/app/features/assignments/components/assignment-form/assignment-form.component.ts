@@ -41,13 +41,16 @@ export class AssignmentFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    
     this.assignmentForm = this.fb.group({
       profileId: ['', Validators.required],
       clientId: ['', Validators.required],
       position: ['', Validators.required],
-      rate: [0, [Validators.required, Validators.min(0)]],
-      startDate: ['', Validators.required],
-      endDate: [''],
+      rate: [null, [Validators.required, Validators.min(0)]],
+      startDate: [dateString, Validators.required],
+      endDate: [null],
       workType: ['remote', Validators.required],
       status: ['proposed', Validators.required]
     });
@@ -96,11 +99,11 @@ export class AssignmentFormComponent implements OnInit {
         this.assignmentForm.patchValue({
           profileId: assignment.profile.id,
           clientId: assignment.client.id,
-          position: assignment.position,
+          position: assignment.additionalInfo?.position || '',
           rate: assignment.rate,
-          startDate: assignment.startDate,
-          endDate: assignment.endDate,
-          workType: assignment.workType,
+          startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : null,
+          endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : null,
+          workType: assignment.additionalInfo?.workType || 'remote',
           status: assignment.status
         });
         this.loading = false;
@@ -114,7 +117,18 @@ export class AssignmentFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.assignmentForm.valid) {
-      const assignmentData = this.assignmentForm.value;
+      const formValue = this.assignmentForm.value;
+      const { position, workType, ...rest } = formValue;
+      
+      const assignmentData = {
+        ...rest,
+        startDate: formValue.startDate,
+        endDate: formValue.endDate || null,
+        additionalInfo: {
+          position,
+          workType
+        }
+      };
 
       this.loading = true;
       if (this.isEdit && this.assignmentId) {
