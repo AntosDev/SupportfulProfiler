@@ -29,7 +29,7 @@ export class AssignmentFormComponent implements OnInit {
   assignmentForm: FormGroup;
   isEdit = false;
   loading = false;
-  assignmentId?: number;
+  assignmentId?: string;
   profiles: Profile[] = [];
   clients: Client[] = [];
 
@@ -57,7 +57,8 @@ export class AssignmentFormComponent implements OnInit {
     this.loadProfiles();
     this.loadClients();
 
-    this.assignmentId = Number(this.route.snapshot.paramMap.get('id'));
+    const id = this.route.snapshot.paramMap.get('id');
+    this.assignmentId = id || undefined;
     const clientId = this.route.snapshot.queryParamMap.get('clientId');
     const profileId = this.route.snapshot.queryParamMap.get('profileId');
 
@@ -88,7 +89,7 @@ export class AssignmentFormComponent implements OnInit {
     });
   }
 
-  private loadAssignment(id: number): void {
+  private loadAssignment(id: string): void {
     this.loading = true;
     this.assignmentService.getAssignment(id).subscribe({
       next: (assignment) => {

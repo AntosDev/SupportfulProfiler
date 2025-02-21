@@ -15,7 +15,7 @@ export class ProfileService {
     return this.api.get<Profile[]>(this.path, filters);
   }
 
-  getProfile(id: number): Observable<Profile> {
+  getProfile(id: string): Observable<Profile> {
     return this.api.get<Profile>(`${this.path}/${id}`);
   }
 
@@ -23,23 +23,23 @@ export class ProfileService {
     return this.api.post<Profile>(this.path, profile);
   }
 
-  updateProfile(id: number, profile: Partial<Profile>): Observable<Profile> {
+  updateProfile(id: string, profile: Partial<Profile>): Observable<Profile> {
     return this.api.put<Profile>(`${this.path}/${id}`, profile);
   }
 
-  deleteProfile(id: number): Observable<void> {
+  deleteProfile(id: string): Observable<void> {
     return this.api.delete<void>(`${this.path}/${id}`);
   }
 
-  addNote(profileId: number, note: Omit<ProfileNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<ProfileNote> {
+  addNote(profileId: string, note: Omit<ProfileNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<ProfileNote> {
     return this.api.post<ProfileNote>(`${this.path}/${profileId}/notes`, note);
   }
 
-  updateNote(profileId: number, noteId: number, note: Partial<ProfileNote>): Observable<ProfileNote> {
+  updateNote(profileId: string, noteId: number, note: Partial<ProfileNote>): Observable<ProfileNote> {
     return this.api.put<ProfileNote>(`${this.path}/${profileId}/notes/${noteId}`, note);
   }
 
-  deleteNote(profileId: number, noteId: number): Observable<void> {
+  deleteNote(profileId: string, noteId: number): Observable<void> {
     return this.api.delete<void>(`${this.path}/${profileId}/notes/${noteId}`);
   }
 

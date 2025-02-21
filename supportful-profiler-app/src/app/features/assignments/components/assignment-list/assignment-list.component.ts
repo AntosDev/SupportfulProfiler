@@ -71,7 +71,7 @@ export class AssignmentListComponent implements OnInit {
       });
   }
 
-  viewAssignment(id: number): void {
+  viewAssignment(id: string): void {
     this.router.navigate(['/assignments', id]);
   }
 

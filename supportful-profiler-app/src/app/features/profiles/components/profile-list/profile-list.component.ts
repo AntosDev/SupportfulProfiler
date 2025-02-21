@@ -153,8 +153,10 @@ export class ProfileListComponent implements OnInit {
       });
   }
 
-  viewProfile(id: number): void {
-    this.router.navigate(['/profiles', id]);
+  viewProfile(id: string): void {
+    if (id) {
+      this.router.navigate(['/profiles', id]);
+    }
   }
 
   createProfile(): void {

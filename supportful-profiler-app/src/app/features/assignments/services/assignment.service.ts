@@ -15,7 +15,7 @@ export class AssignmentService {
     return this.api.get<Assignment[]>(this.path, filters);
   }
 
-  getAssignment(id: number): Observable<Assignment> {
+  getAssignment(id: string): Observable<Assignment> {
     return this.api.get<Assignment>(`${this.path}/${id}`);
   }
 
@@ -23,31 +23,31 @@ export class AssignmentService {
     return this.api.post<Assignment>(this.path, assignment);
   }
 
-  updateAssignment(id: number, assignment: Partial<Assignment>): Observable<Assignment> {
+  updateAssignment(id: string, assignment: Partial<Assignment>): Observable<Assignment> {
     return this.api.put<Assignment>(`${this.path}/${id}`, assignment);
   }
 
-  deleteAssignment(id: number): Observable<void> {
+  deleteAssignment(id: string): Observable<void> {
     return this.api.delete<void>(`${this.path}/${id}`);
   }
 
-  addNote(assignmentId: number, note: Omit<AssignmentNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<AssignmentNote> {
+  addNote(assignmentId: string, note: Omit<AssignmentNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<AssignmentNote> {
     return this.api.post<AssignmentNote>(`${this.path}/${assignmentId}/notes`, note);
   }
 
-  updateNote(assignmentId: number, noteId: number, note: Partial<AssignmentNote>): Observable<AssignmentNote> {
+  updateNote(assignmentId: string, noteId: string, note: Partial<AssignmentNote>): Observable<AssignmentNote> {
     return this.api.put<AssignmentNote>(`${this.path}/${assignmentId}/notes/${noteId}`, note);
   }
 
-  deleteNote(assignmentId: number, noteId: number): Observable<void> {
+  deleteNote(assignmentId: string, noteId: string): Observable<void> {
     return this.api.delete<void>(`${this.path}/${assignmentId}/notes/${noteId}`);
   }
 
-  getAssignmentsByProfile(profileId: number): Observable<Assignment[]> {
+  getAssignmentsByProfile(profileId: string): Observable<Assignment[]> {
     return this.api.get<Assignment[]>(`${this.path}/profile/${profileId}`);
   }
 
-  getAssignmentsByClient(clientId: number): Observable<Assignment[]> {
+  getAssignmentsByClient(clientId: string): Observable<Assignment[]> {
     return this.api.get<Assignment[]>(`${this.path}/client/${clientId}`);
   }
 }

@@ -62,9 +62,6 @@
     <!-- Client list -->
     <ion-list *ngIf="!loading && clients.length > 0">
       <ion-item *ngFor="let client of clients" button (click)="viewClient(client.id)" [attr.disabled]="!client.id">
-        <ion-avatar slot="start">
-          <img src="assets/company-placeholder.png" alt="Company logo">
-        </ion-avatar>
         <ion-label>
           <h2>{{ client.companyName }}</h2>
           <h3>{{ client.industry }}</h3>
@@ -79,9 +76,6 @@
     <!-- Loading skeleton -->
     <ion-list *ngIf="loading">
       <ion-item *ngFor="let i of [1,2,3,4,5]">
-        <ion-avatar slot="start">
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </ion-avatar>
         <ion-label>
           <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
           <h3><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></h3>

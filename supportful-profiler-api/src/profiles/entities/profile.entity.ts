@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Assignment } from '../../assignments/entities/assignment.entity';
+import { ProfileNote } from './profile-note.entity';
 
 @Entity()
 export class Profile {
@@ -50,6 +51,9 @@ export class Profile {
 
   @OneToMany(() => Assignment, assignment => assignment.profile)
   assignments: Assignment[];
+
+  @OneToMany(() => ProfileNote, note => note.profile)
+  notes: ProfileNote[];
 
   @Column('simple-json', { nullable: true })
   additionalInfo?: Record<string, any>;

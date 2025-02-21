@@ -64,9 +64,6 @@
   <div class="ion-padding">
     <ion-list *ngIf="!loading && profiles.length > 0">
       <ion-item *ngFor="let profile of profiles" button (click)="viewProfile(profile.id!)" [attr.disabled]="!profile.id">
-        <ion-avatar slot="start">
-          <img src="assets/avatar-placeholder.png" alt="Profile avatar">
-        </ion-avatar>
         <ion-label>
           <h2>{{ profile.firstName }} {{ profile.lastName }}</h2>
           <h3>{{ profile.title }}</h3>
@@ -80,9 +77,6 @@
 
     <ion-list *ngIf="loading">
       <ion-item *ngFor="let i of [1,2,3,4,5]">
-        <ion-avatar slot="start">
-          <ion-skeleton-text animated></ion-skeleton-text>
-        </ion-avatar>
         <ion-label>
           <h2><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h2>
           <h3><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></h3>

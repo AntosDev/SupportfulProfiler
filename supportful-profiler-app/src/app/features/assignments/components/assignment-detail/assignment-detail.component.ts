@@ -39,13 +39,13 @@ export class AssignmentDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadAssignment(id);
     }
   }
 
-  private loadAssignment(id: number): void {
+  private loadAssignment(id: string): void {
     this.loading = true;
     this.assignmentService.getAssignment(id).subscribe({
       next: (assignment) => {
@@ -73,7 +73,7 @@ export class AssignmentDetailComponent implements OnInit {
     }
   }
 
-  async deleteNote(noteId: number): Promise<void> {
+  async deleteNote(noteId: string): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
       message: 'Are you sure you want to delete this note?',
@@ -137,8 +137,10 @@ export class AssignmentDetailComponent implements OnInit {
     await alert.present();
   }
 
-  viewProfile(id: number): void {
-    this.router.navigate(['/profiles', id]);
+  viewProfile(id: string): void {
+    if (id) {
+      this.router.navigate(['/profiles', id]);
+    }
   }
 
   viewClient(id: string): void {

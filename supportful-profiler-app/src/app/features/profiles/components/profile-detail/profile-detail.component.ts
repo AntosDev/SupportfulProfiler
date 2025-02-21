@@ -42,13 +42,15 @@ export class ProfileDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadProfile(id);
+    } else {
+      this.router.navigate(['/profiles']);
     }
   }
 
-  private loadProfile(id: number): void {
+  private loadProfile(id: string): void {
     this.loading = true;
     this.profileService.getProfile(id).subscribe({
       next: (profile) => {
@@ -58,6 +60,7 @@ export class ProfileDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading profile:', error);
         this.loading = false;
+        this.router.navigate(['/profiles']);
       }
     });
   }

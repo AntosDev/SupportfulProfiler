@@ -40,7 +40,7 @@ export class ClientFormComponent implements OnInit {
       primaryContactName: ['', Validators.required],
       primaryContactEmail: ['', [Validators.required, Validators.email]],
       primaryContactPhone: [''],
-      locations: [[]],
+      locations: [''],
       status: ['active', Validators.required],
       requirements: [null],
       additionalInfo: [null]
@@ -67,7 +67,7 @@ export class ClientFormComponent implements OnInit {
           primaryContactName: client.primaryContactName,
           primaryContactEmail: client.primaryContactEmail,
           primaryContactPhone: client.primaryContactPhone,
-          locations: client.locations,
+          locations: client.locations?.join('\n'),
           status: client.status,
           requirements: client.requirements,
           additionalInfo: client.additionalInfo
@@ -84,7 +84,32 @@ export class ClientFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.clientForm.valid) {
-      const clientData = this.clientForm.value;
+      const formValue = this.clientForm.value;
+      
+      // Transform locations string to array
+      const clientData = {
+        ...formValue,
+        locations: formValue.locations ? formValue.locations.split('\n').map((loc: string) => loc.trim()).filter(Boolean) : []
+      };
+
+      // Parse JSON strings if they exist
+      if (typeof clientData.requirements === 'string' && clientData.requirements.trim()) {
+        try {
+          clientData.requirements = JSON.parse(clientData.requirements);
+        } catch (e) {
+          console.error('Invalid requirements JSON');
+          return;
+        }
+      }
+
+      if (typeof clientData.additionalInfo === 'string' && clientData.additionalInfo.trim()) {
+        try {
+          clientData.additionalInfo = JSON.parse(clientData.additionalInfo);
+        } catch (e) {
+          console.error('Invalid additional info JSON');
+          return;
+        }
+      }
       
       this.loading = true;
       if (this.isEdit && this.clientId) {

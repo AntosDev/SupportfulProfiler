@@ -2,7 +2,7 @@ import { Profile } from './profile.interface';
 import { Client } from './client.interface';
 
 export interface Assignment {
-    id?: number;
+    id?: string;
     profile: Profile;
     client: Client;
     status: AssignmentStatus;
@@ -27,7 +27,7 @@ export type AssignmentStatus =
     | 'terminated';
 
 export interface AssignmentNote {
-    id?: number;
+    id?: string;
     content: string;
     type: 'general' | 'interview' | 'feedback' | 'performance' | 'issue';
     createdAt: Date;

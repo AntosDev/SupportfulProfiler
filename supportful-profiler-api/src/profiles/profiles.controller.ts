@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/
 import { ProfilesService } from './profiles.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileNoteDto } from './dto/create-profile-note.dto';
 
 @ApiTags('profiles')
 @Controller('profiles')
@@ -90,5 +91,30 @@ export class ProfilesController {
   @ApiResponse({ status: 200, description: 'Profiles matching skills retrieved successfully' })
   searchBySkills(@Body('skills', ValidationPipe) skills: string[]) {
     return this.profilesService.searchBySkills(skills);
+  }
+
+  @Post(':id/notes')
+  @ApiOperation({ summary: 'Add a note to a profile' })
+  @ApiParam({ name: 'id', description: 'Profile ID (UUID)' })
+  @ApiResponse({ status: 201, description: 'Note successfully added' })
+  @ApiResponse({ status: 404, description: 'Profile not found' })
+  addNote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) createNoteDto: CreateProfileNoteDto
+  ) {
+    return this.profilesService.addNote(id, createNoteDto);
+  }
+
+  @Delete(':profileId/notes/:noteId')
+  @ApiOperation({ summary: 'Delete a note from a profile' })
+  @ApiParam({ name: 'profileId', description: 'Profile ID (UUID)' })
+  @ApiParam({ name: 'noteId', description: 'Note ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Note successfully deleted' })
+  @ApiResponse({ status: 404, description: 'Profile or note not found' })
+  deleteNote(
+    @Param('profileId', ParseUUIDPipe) profileId: string,
+    @Param('noteId', ParseUUIDPipe) noteId: string
+  ) {
+    return this.profilesService.deleteNote(profileId, noteId);
   }
 } 

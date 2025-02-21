@@ -2,14 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
+import { ProfileNote } from './entities/profile-note.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileNoteDto } from './dto/create-profile-note.dto';
 
 @Injectable()
 export class ProfilesService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(ProfileNote)
+    private readonly noteRepository: Repository<ProfileNote>,
   ) {}
 
   async create(createProfileDto: CreateProfileDto): Promise<Profile> {
@@ -116,7 +120,7 @@ export class ProfilesService {
   async findOne(id: string): Promise<Profile> {
     const profile = await this.profileRepository.findOne({
       where: { id },
-      relations: ['assignments', 'assignments.client'],
+      relations: ['assignments', 'assignments.client', 'notes'],
     });
     
     if (!profile) {
@@ -165,5 +169,29 @@ export class ProfilesService {
       where: { isAvailable: true },
       order: { yearsOfExperience: 'DESC' },
     });
+  }
+
+  async addNote(profileId: string, createNoteDto: CreateProfileNoteDto): Promise<ProfileNote> {
+    const profile = await this.findOne(profileId);
+    
+    const note = this.noteRepository.create({
+      ...createNoteDto,
+      profile
+    });
+
+    return await this.noteRepository.save(note);
+  }
+
+  async deleteNote(profileId: string, noteId: string): Promise<void> {
+    const profile = await this.findOne(profileId);
+    const note = await this.noteRepository.findOne({
+      where: { id: noteId, profile: { id: profileId } }
+    });
+
+    if (!note) {
+      throw new NotFoundException(`Note with ID ${noteId} not found for profile ${profileId}`);
+    }
+
+    await this.noteRepository.remove(note);
   }
 } 
