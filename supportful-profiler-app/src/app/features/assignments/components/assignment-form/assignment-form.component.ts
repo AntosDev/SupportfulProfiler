@@ -83,7 +83,7 @@ export class AssignmentFormComponent implements OnInit {
 
   private loadClients(): void {
     this.clientService.getClients().subscribe({
-      next: (clients) => this.clients = clients,
+      next: ([clients]) => this.clients = clients,
       error: (error) => console.error('Error loading clients:', error)
     });
   }

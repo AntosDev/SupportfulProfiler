@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, FindOptionsWhere, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -21,39 +21,96 @@ export class ProfilesService {
     skip?: number;
     take?: number;
     searchTerm?: string;
-    skills?: string[];
-    isAvailable?: boolean;
-    yearsOfExperience?: number;
+    skills?: string[] | string;
+    availability?: string;
+    yearsOfExperience?: string;
+    expectedRate?: number;
+    minExperience?: number;
+    maxExperience?: number;
   }): Promise<Profile[]> {
-    const { skip = 0, take = 10, searchTerm, skills, isAvailable, yearsOfExperience } = params;
+    const { 
+      skip = 0, 
+      take = 50,
+      searchTerm, 
+      skills, 
+      availability, 
+      yearsOfExperience,
+      expectedRate,
+      minExperience,
+      maxExperience 
+    } = params;
+
+    console.log('Received params:', params);
     
     const queryBuilder = this.profileRepository.createQueryBuilder('profile');
-    queryBuilder.skip(skip).take(take);
 
-    if (searchTerm) {
-      queryBuilder.andWhere('profile.firstName LIKE :searchTerm', { searchTerm: `%${searchTerm}%` });
+    // Only apply pagination if explicitly requested
+    if (typeof skip === 'number' && skip > 0) {
+      queryBuilder.skip(skip);
+    }
+    if (typeof take === 'number' && take > 0) {
+      queryBuilder.take(take);
+    }
+
+    if (searchTerm && typeof searchTerm === 'string' && searchTerm.trim()) {
+      // Use LIKE with wildcards for partial matches
+      const searchPattern = `%${searchTerm.trim()}%`;
+      queryBuilder.andWhere(
+        '(LOWER(profile.firstName) LIKE LOWER(:searchPattern) OR LOWER(profile.lastName) LIKE LOWER(:searchPattern))',
+        { searchPattern }
+      );
     }
     
-    if (skills?.length) {
-      const skillsConditions = skills.map((skill, index) => {
-        const param = `skill${index}`;
-        queryBuilder.setParameter(param, `%${skill}%`);
-        return `profile.skills LIKE :${param}`;
-      });
-      queryBuilder.andWhere(`(${skillsConditions.join(' OR ')})`);
+    if (skills && (Array.isArray(skills) || (typeof skills === 'string' && skills.trim()))) {
+      // Convert skills to array if it's a string
+      const skillsArray = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim()).filter(Boolean);
+      
+      if (skillsArray.length > 0) {
+        // For SQLite, use case-insensitive comparison for skills
+        skillsArray.forEach((skill, index) => {
+          queryBuilder.andWhere(
+            `EXISTS (
+              SELECT 1 FROM json_each(profile.skills)
+              WHERE LOWER(json_each.value) = LOWER(:skill${index})
+            )`,
+            { [`skill${index}`]: skill }
+          );
+        });
+      }
     }
     
-    if (typeof isAvailable === 'boolean') {
-      queryBuilder.andWhere('profile.isAvailable = :isAvailable', { isAvailable });
+    if (availability && typeof availability === 'string' && availability.trim()) {
+      queryBuilder.andWhere('profile.availability = :availability', { availability });
     }
     
-    if (yearsOfExperience !== undefined) {
-      queryBuilder.andWhere('profile.yearsOfExperience = :yearsOfExperience', { yearsOfExperience });
+    // Handle experience filtering
+    if (typeof minExperience === 'number') {
+      queryBuilder.andWhere('profile.yearsOfExperience >= :minExperience', { minExperience });
+    }
+    if (typeof maxExperience === 'number') {
+      queryBuilder.andWhere('profile.yearsOfExperience <= :maxExperience', { maxExperience });
+    }
+
+    if (typeof expectedRate === 'number' && !isNaN(expectedRate)) {
+      queryBuilder.andWhere('profile.expectedRate = :expectedRate', { expectedRate });
     }
 
     queryBuilder.orderBy('profile.createdAt', 'DESC');
 
-    return await queryBuilder.getMany();
+    const query = queryBuilder.getSql();
+    const parameters = queryBuilder.getParameters();
+    console.log('Generated SQL:', query);
+    console.log('Query parameters:', parameters);
+
+    const result = await queryBuilder.getMany();
+    console.log('Query result count:', result.length);
+    
+    // Log the years of experience for debugging
+    result.forEach(profile => {
+      console.log(`Profile ${profile.firstName} ${profile.lastName}: ${profile.yearsOfExperience} years`);
+    });
+
+    return result;
   }
 
   async findOne(id: string): Promise<Profile> {
@@ -88,12 +145,18 @@ export class ProfilesService {
     }
 
     const queryBuilder = this.profileRepository.createQueryBuilder('profile');
-    const skillsConditions = skills.map((skill, index) => {
-      const param = `skill${index}`;
-      queryBuilder.setParameter(param, `%${skill}%`);
-      return `profile.skills LIKE :${param}`;
+    
+    // Use the same skills search as findAll
+    skills.forEach((skill, index) => {
+      queryBuilder.andWhere(
+        `EXISTS (
+          SELECT 1 FROM json_each(profile.skills)
+          WHERE json_each.value = :skill${index}
+        )`,
+        { [`skill${index}`]: skill }
+      );
     });
-    queryBuilder.where(`(${skillsConditions.join(' OR ')})`);
+
     return await queryBuilder.getMany();
   }
 

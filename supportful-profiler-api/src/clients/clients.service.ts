@@ -25,33 +25,64 @@ export class ClientsService {
     status?: string;
     location?: string;
   }): Promise<[Client[], number]> {
-    const { skip = 0, take = 10, searchTerm, industry, status, location } = params;
+    const { skip = 0, take = 50, searchTerm, industry, status, location } = params;
+    
+    console.log('Received client search params:', params);
     
     const queryBuilder = this.clientRepository.createQueryBuilder('client');
-    queryBuilder.skip(skip).take(take);
 
-    if (searchTerm) {
+    // Only apply pagination if explicitly requested
+    if (typeof skip === 'number' && skip > 0) {
+      queryBuilder.skip(skip);
+    }
+    if (typeof take === 'number' && take > 0) {
+      queryBuilder.take(take);
+    }
+
+    if (searchTerm && typeof searchTerm === 'string' && searchTerm.trim()) {
+      const pattern = `%${searchTerm.trim()}%`;
       queryBuilder.where(
-        '(LOWER(client.companyName) LIKE LOWER(:searchTerm) OR LOWER(client.description) LIKE LOWER(:searchTerm))',
-        { searchTerm: `%${searchTerm}%` }
+        `(
+          LOWER(client.companyName) LIKE LOWER(:pattern) OR 
+          LOWER(client.description) LIKE LOWER(:pattern) OR
+          LOWER(client.primaryContactName) LIKE LOWER(:pattern) OR
+          LOWER(client.industry) LIKE LOWER(:pattern)
+        )`,
+        { pattern }
       );
     }
 
-    if (industry) {
-      queryBuilder.andWhere('LOWER(client.industry) LIKE LOWER(:industry)', { industry: `%${industry}%` });
+    if (industry && typeof industry === 'string' && industry.trim()) {
+      queryBuilder.andWhere('LOWER(client.industry) = LOWER(:industry)', { industry: industry.trim() });
     }
 
-    if (status) {
-      queryBuilder.andWhere('client.status = :status', { status });
+    if (status && typeof status === 'string' && status.trim()) {
+      queryBuilder.andWhere('client.status = :status', { status: status.trim() });
     }
 
-    if (location) {
-      queryBuilder.andWhere('client.locations && ARRAY[:location]', { location });
+    if (location && typeof location === 'string' && location.trim()) {
+      // Improved location search with case-insensitive comparison
+      const locationPattern = location.trim().toLowerCase();
+      queryBuilder.andWhere(
+        `EXISTS (
+          SELECT 1 FROM unnest(client.locations) loc
+          WHERE LOWER(loc) LIKE :locationPattern
+        )`,
+        { locationPattern: `%${locationPattern}%` }
+      );
     }
 
     queryBuilder.orderBy('client.createdAt', 'DESC');
+    
+    const query = queryBuilder.getSql();
+    const parameters = queryBuilder.getParameters();
+    console.log('Generated SQL:', query);
+    console.log('Query parameters:', parameters);
 
-    return await queryBuilder.getManyAndCount();
+    const [clients, total] = await queryBuilder.getManyAndCount();
+    console.log(`Found ${clients.length} clients out of ${total} total`);
+
+    return [clients, total];
   }
 
   async findOne(id: string): Promise<Client> {

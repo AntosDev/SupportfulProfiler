@@ -27,6 +27,7 @@ export class ProfileListComponent implements OnInit {
   profiles: Profile[] = [];
   filterForm: FormGroup;
   loading = false;
+  hasFilters = false;
 
   constructor(
     private profileService: ProfileService,
@@ -43,7 +44,7 @@ export class ProfileListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadProfiles();
+    this.loadAllProfiles();
     this.setupSearchSubscription();
   }
 
@@ -54,17 +55,94 @@ export class ProfileListComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe(() => {
+        this.hasFilters = this.hasActiveFilters();
         this.loadProfiles();
       });
   }
 
-  private loadProfiles(): void {
+  private hasActiveFilters(): boolean {
+    const values = this.filterForm.value;
+    return !!(
+      values.search?.trim() ||
+      values.skills?.trim() ||
+      values.availability ||
+      values.experience ||
+      values.workType
+    );
+  }
+
+  private loadAllProfiles(): void {
+    console.log('Loading all profiles...');
     this.loading = true;
-    const filters = this.filterForm.value;
+    this.profileService.getProfiles({})
+      .subscribe({
+        next: (profiles) => {
+          console.log('Received all profiles:', profiles);
+          this.profiles = profiles;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading all profiles:', error);
+          this.loading = false;
+        }
+      });
+  }
+
+  private loadProfiles(): void {
+    if (!this.hasFilters) {
+      this.loadAllProfiles();
+      return;
+    }
+
+    this.loading = true;
+    const formValues = this.filterForm.value;
+    
+    // Transform filters to match backend expectations
+    const filters: any = {};
+
+    // Only add defined values
+    if (formValues.search?.trim()) {
+      filters.searchTerm = formValues.search.trim();
+    }
+
+    if (formValues.availability && formValues.availability !== '') {
+      filters.availability = formValues.availability;
+    }
+
+    if (formValues.experience && formValues.experience !== '') {
+      switch (formValues.experience) {
+        case '0-2':
+          filters.maxExperience = 2;
+          break;
+        case '3-5':
+          filters.minExperience = 3;
+          filters.maxExperience = 5;
+          break;
+        case '5-8':
+          filters.minExperience = 5;
+          filters.maxExperience = 8;
+          break;
+        case '8+':
+          filters.minExperience = 8;
+          break;
+      }
+      console.log('Experience filter:', { original: formValues.experience, transformed: filters });
+    }
+
+    if (formValues.skills?.trim()) {
+      filters.skills = formValues.skills.trim().split(',').map((s: string) => s.trim());
+    }
+
+    if (formValues.workType && formValues.workType !== '') {
+      filters.preferredWorkType = formValues.workType;
+    }
+
+    console.log('Sending filters to backend:', filters);
     
     this.profileService.getProfiles(filters)
       .subscribe({
         next: (profiles) => {
+          console.log('Received profiles:', profiles);
           this.profiles = profiles;
           this.loading = false;
         },

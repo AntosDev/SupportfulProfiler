@@ -23,24 +23,27 @@ export class ProfilesController {
   @ApiQuery({ name: 'take', required: false, description: 'Number of records to take' })
   @ApiQuery({ name: 'searchTerm', required: false, description: 'Search term for profile name' })
   @ApiQuery({ name: 'skills', required: false, description: 'Filter by skills', isArray: true })
-  @ApiQuery({ name: 'isAvailable', required: false, description: 'Filter by availability' })
-  @ApiQuery({ name: 'yearsOfExperience', required: false, description: 'Filter by years of experience' })
+  @ApiQuery({ name: 'availability', required: false, description: 'Filter by availability' })
+  @ApiQuery({ name: 'minExperience', required: false, description: 'Minimum years of experience' })
+  @ApiQuery({ name: 'maxExperience', required: false, description: 'Maximum years of experience' })
   @ApiResponse({ status: 200, description: 'List of profiles retrieved successfully' })
   findAll(
     @Query('skip') skip?: number,
     @Query('take') take?: number,
     @Query('searchTerm') searchTerm?: string,
     @Query('skills') skills?: string[],
-    @Query('isAvailable', new ParseBoolPipe({ optional: true })) isAvailable?: boolean,
-    @Query('yearsOfExperience') yearsOfExperience?: number,
+    @Query('availability') availability?: string,
+    @Query('minExperience') minExperience?: number,
+    @Query('maxExperience') maxExperience?: number,
   ) {
     return this.profilesService.findAll({
       skip: skip ? +skip : undefined,
       take: take ? +take : undefined,
       searchTerm,
       skills,
-      isAvailable,
-      yearsOfExperience: yearsOfExperience ? +yearsOfExperience : undefined,
+      availability,
+      minExperience: minExperience ? +minExperience : undefined,
+      maxExperience: maxExperience ? +maxExperience : undefined,
     });
   }
 

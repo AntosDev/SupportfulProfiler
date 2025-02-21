@@ -93,7 +93,8 @@
 
     <div *ngIf="!loading && profiles.length === 0" class="ion-text-center ion-padding">
       <ion-icon name="search" size="large" color="medium"></ion-icon>
-      <p>No profiles found matching your criteria</p>
+      <p *ngIf="hasFilters">No profiles found matching your search criteria</p>
+      <p *ngIf="!hasFilters">No profiles available in the system</p>
     </div>
   </div>
 </ion-content>

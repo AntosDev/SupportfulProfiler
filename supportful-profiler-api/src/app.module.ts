@@ -7,6 +7,7 @@ import { databaseConfig } from './config/database.config';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ClientsModule } from './clients/clients.module';
 import { AssignmentsModule } from './assignments/assignments.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AssignmentsModule } from './assignments/assignments.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(databaseConfig),
+    AuthModule,
     ProfilesModule,
     ClientsModule,
     AssignmentsModule,

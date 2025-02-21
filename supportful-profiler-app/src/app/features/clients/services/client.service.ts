@@ -11,11 +11,11 @@ export class ClientService {
 
   constructor(private api: ApiService) {}
 
-  getClients(filters?: any): Observable<Client[]> {
-    return this.api.get<Client[]>(this.path, filters);
+  getClients(filters?: any): Observable<[Client[], number]> {
+    return this.api.get<[Client[], number]>(this.path, filters);
   }
 
-  getClient(id: number): Observable<Client> {
+  getClient(id: string): Observable<Client> {
     return this.api.get<Client>(`${this.path}/${id}`);
   }
 
@@ -23,23 +23,23 @@ export class ClientService {
     return this.api.post<Client>(this.path, client);
   }
 
-  updateClient(id: number, client: Partial<Client>): Observable<Client> {
+  updateClient(id: string, client: Partial<Client>): Observable<Client> {
     return this.api.put<Client>(`${this.path}/${id}`, client);
   }
 
-  deleteClient(id: number): Observable<void> {
+  deleteClient(id: string): Observable<void> {
     return this.api.delete<void>(`${this.path}/${id}`);
   }
 
-  addNote(clientId: number, note: Omit<ClientNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<ClientNote> {
+  addNote(clientId: string, note: Omit<ClientNote, 'id' | 'createdAt' | 'updatedAt'>): Observable<ClientNote> {
     return this.api.post<ClientNote>(`${this.path}/${clientId}/notes`, note);
   }
 
-  updateNote(clientId: number, noteId: number, note: Partial<ClientNote>): Observable<ClientNote> {
+  updateNote(clientId: string, noteId: number, note: Partial<ClientNote>): Observable<ClientNote> {
     return this.api.put<ClientNote>(`${this.path}/${clientId}/notes/${noteId}`, note);
   }
 
-  deleteNote(clientId: number, noteId: number): Observable<void> {
+  deleteNote(clientId: string, noteId: number): Observable<void> {
     return this.api.delete<void>(`${this.path}/${clientId}/notes/${noteId}`);
   }
 

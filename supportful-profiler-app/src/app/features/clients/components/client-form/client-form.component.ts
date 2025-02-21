@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientService } from '../../services/client.service';
 import { Client } from '../../../../shared/interfaces/client.interface';
@@ -24,7 +24,7 @@ export class ClientFormComponent implements OnInit {
   clientForm: FormGroup;
   isEdit = false;
   loading = false;
-  clientId?: number;
+  clientId?: string;
 
   constructor(
     private fb: FormBuilder,
@@ -35,88 +35,49 @@ export class ClientFormComponent implements OnInit {
     this.clientForm = this.fb.group({
       companyName: ['', Validators.required],
       industry: ['', Validators.required],
-      primaryContact: this.fb.group({
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        title: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        phone: [''],
-        isMainContact: [true]
-      }),
-      additionalContacts: this.fb.array([]),
-      location: ['', Validators.required],
-      timezone: ['', Validators.required],
       website: [''],
-      status: ['active', Validators.required]
+      description: [''],
+      primaryContactName: ['', Validators.required],
+      primaryContactEmail: ['', [Validators.required, Validators.email]],
+      primaryContactPhone: [''],
+      locations: [[]],
+      status: ['active', Validators.required],
+      requirements: [null],
+      additionalInfo: [null]
     });
   }
 
   ngOnInit(): void {
-    this.clientId = Number(this.route.snapshot.paramMap.get('id'));
+    this.clientId = this.route.snapshot.paramMap.get('id') || undefined;
     if (this.clientId) {
       this.isEdit = true;
       this.loadClient(this.clientId);
     }
   }
 
-  get additionalContacts(): FormArray {
-    return this.clientForm.get('additionalContacts') as FormArray;
-  }
-
-  addContact(): void {
-    const contactForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      title: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: [''],
-      isMainContact: [false]
-    });
-
-    this.additionalContacts.push(contactForm);
-  }
-
-  removeContact(index: number): void {
-    this.additionalContacts.removeAt(index);
-  }
-
-  private loadClient(id: number): void {
+  private loadClient(id: string): void {
     this.loading = true;
     this.clientService.getClient(id).subscribe({
       next: (client) => {
-        // Clear existing additional contacts
-        while (this.additionalContacts.length) {
-          this.additionalContacts.removeAt(0);
-        }
-
-        // Add additional contacts if they exist
-        client.additionalContacts?.forEach(contact => {
-          this.additionalContacts.push(this.fb.group({
-            firstName: [contact.firstName, Validators.required],
-            lastName: [contact.lastName, Validators.required],
-            title: [contact.title, Validators.required],
-            email: [contact.email, [Validators.required, Validators.email]],
-            phone: [contact.phone],
-            isMainContact: [contact.isMainContact]
-          }));
-        });
-
-        // Update form with client data
         this.clientForm.patchValue({
           companyName: client.companyName,
           industry: client.industry,
-          primaryContact: client.primaryContact,
-          location: client.location,
-          timezone: client.timezone,
           website: client.website,
-          status: client.status
+          description: client.description,
+          primaryContactName: client.primaryContactName,
+          primaryContactEmail: client.primaryContactEmail,
+          primaryContactPhone: client.primaryContactPhone,
+          locations: client.locations,
+          status: client.status,
+          requirements: client.requirements,
+          additionalInfo: client.additionalInfo
         });
-
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading client:', error);
         this.loading = false;
+        this.router.navigate(['/clients']);
       }
     });
   }
@@ -124,7 +85,7 @@ export class ClientFormComponent implements OnInit {
   onSubmit(): void {
     if (this.clientForm.valid) {
       const clientData = this.clientForm.value;
-
+      
       this.loading = true;
       if (this.isEdit && this.clientId) {
         this.clientService.updateClient(this.clientId, clientData).subscribe({

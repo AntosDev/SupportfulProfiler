@@ -141,8 +141,10 @@ export class AssignmentDetailComponent implements OnInit {
     this.router.navigate(['/profiles', id]);
   }
 
-  viewClient(id: number): void {
-    this.router.navigate(['/clients', id]);
+  viewClient(id: string): void {
+    if (id) {
+      this.router.navigate(['/clients', id]);
+    }
   }
 
   getStatusColor(status: string): string {

@@ -1,14 +1,17 @@
 export interface Client {
-    id?: number;
+    id: string;
     companyName: string;
     industry: string;
-    primaryContact: ContactPerson;
-    additionalContacts?: ContactPerson[];
-    location: string;
-    timezone: string;
     website?: string;
-    notes: ClientNote[];
-    status: 'active' | 'inactive' | 'potential';
+    description?: string;
+    primaryContactName: string;
+    primaryContactEmail: string;
+    primaryContactPhone?: string;
+    locations?: string[];
+    status: 'active' | 'inactive' | 'pending';
+    assignments?: any[];
+    requirements?: Record<string, any>;
+    additionalInfo?: Record<string, any>;
     createdAt: Date;
     updatedAt: Date;
 }
